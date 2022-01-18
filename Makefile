@@ -1,8 +1,11 @@
-SRC = main.c utils.c first_cmd.c ft_split.c
+SRC = main.c utils.c first_cmd.c ft_split.c \
+get_next_line_utils.c \
+get_next_line.c \
 
 CC = gcc
 
-HEADER = pipex.h
+HEADER = pipex.h \
+get_next_line.h \
 
 OBJ = $(SRC:%.c=./.build/%.o)
 
@@ -35,7 +38,7 @@ ${NAME} : $(OBJ)
 
 clean :
 	@${RM} .build
-	@printf "${B_RED}Deleting ./.build folder ...${NONE}\n"
+	@printf "${B_RED}Deleting .build folder ...${NONE}\n"
 
 fclean :	clean
 	@${RM} ${NAME}

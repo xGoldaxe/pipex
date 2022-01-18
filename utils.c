@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 14:07:33 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/18 14:07:35 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/18 18:04:18 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,4 +80,21 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	ft_strlcpy(res, s1, ft_strlen(s1) + 1);
 	ft_strlcpy(&res[ft_strlen(s1)], s2, ft_strlen(s2) + 1);
 	return (res);
+}
+
+int	ft_strclen(char *str, char c)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] && str[i] != c)
+		++i;
+	return (i);
+}
+
+int	ft_biggest(int a, int b)
+{
+	if (b > a)
+		return (b);
+	return (a);
 }
