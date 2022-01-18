@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/15 16:24:21 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/18 18:34:24 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/18 19:13:50 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,5 +38,6 @@ int		run_command(int entry_pipe, int	*pipe_fd, char **argv, char **env);
 char	**parse_cmd(char *command, char **paths);
 int		input_error(char *error_type, char	*precision, int type);
 int		limited_stdin(char **argv);
+int		write_command_output(int pipe_fd, char *output, int add_to);
 
 #endif

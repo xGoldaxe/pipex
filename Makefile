@@ -1,4 +1,4 @@
-SRC = main.c utils.c first_cmd.c ft_split.c \
+SRC = main.c utils.c first_cmd.c ft_split.c command.c\
 get_next_line_utils.c \
 get_next_line.c \
 
@@ -33,7 +33,7 @@ all :
 
 ${NAME} : $(OBJ)
 	@printf "${B_CYAN}${NAME} is linking ...${NONE}\n"
-	@${CC} ${CFLAGS} -o ${NAME} ${OBJ} -I
+	@${CC} ${CFLAGS} -o ${NAME}  ${OBJ} -I -fsanitize=address -g
 	@printf "${B_GREEN}==>{${NAME}} LINKED SUCCESFULLY<==${NONE}\n"
 
 clean :
