@@ -6,102 +6,159 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/15 16:24:13 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/17 14:47:31 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/18 14:12:54 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	read_command_output(int	*pipe_fd, char *output)
+int	write_command_output(int pipe_fd, char *output)
 {
 	char	buffer[1024];
 	int		ret;
-	int		status;
 	int		fd;
 
-	close(pipe_fd[1]);
 	unlink(output);
 	fd = open(output, O_WRONLY | O_CREAT, S_IRWXU);
 	if (fd == -1)
 	{
 		perror("open");
-		return (1);
+		return (-1);
 	}
 	printf("\n<---OUTPUT--->\n");
-	while ((ret = read(0, buffer, 1024)) != 0)
+	ret = 1;
+	while (ret > 0)
 	{
-		buffer[ret] = 0;
-		write(fd ,buffer, strlen(buffer));
-		write(1 ,buffer, strlen(buffer));
+		ret = read(pipe_fd, buffer, 1024);
+		write(fd, buffer, ret);
+		write(1, buffer, ret);
 	}
 	printf("\n<---//////--->\n");
 	close(fd);
+	close(pipe_fd);
 	return (0);
 }
 
-int	run_command(int	*pipe_fd, char **argv, char **env, int new_entry)
+int	run_command(int entry_pipe, int	*pipe_fd, char **parsed_cmd, char **env)
 {
-	char	**args;
-	char	buffer[1024];
-	int		readed;
-
-	args = ft_split(argv[0], ' ');
-	if (dup2(pipe_fd[1], 1) == -1)
-		perror("dup2");
-	if (!args)
+	if (dup2(entry_pipe, 0) == -1 || dup2(pipe_fd[1], 1) == -1)
+		return (-1);
+	close(pipe_fd[0]);
+	close(pipe_fd[1]);
+	close(entry_pipe);
+	if (!parsed_cmd)
 		perror("split error");
-	if (execve(args[0], &args[0], env) == -1)
+	if (execve(parsed_cmd[0], &parsed_cmd[0], env) == -1)
 		perror("execve");
-	return (1);
+	return (-1);
+}
+
+char	**parse_cmd(char *command, char **paths)
+{
+	char	**parsed_cmd;
+	int		i;
+	char	*full_path;
+
+	parsed_cmd = ft_split(command, ' ');
+	if (!parsed_cmd)
+		return (NULL);
+	i = -1;
+	while (paths[++i])
+	{
+		full_path = ft_strjoin(paths[i], "/");
+		full_path = ft_strjoin(full_path, parsed_cmd[0]);
+		if (access(full_path, F_OK | X_OK) == 0)
+		{
+			free(parsed_cmd[0]);
+			parsed_cmd[0] = full_path;
+			return (parsed_cmd);
+		}
+	}
+	perror("invalid command");
+	return (NULL);
+}
+
+int	iter_pipes(int argc, char **argv, char **env, char **paths)
+{
+	pid_t	pid;
+	int		first_pipe;
+	int		new_pipe_fd[2];
+	int		arg_i;
+	char	**p_cmd;
+
+	first_pipe = first_cmd(argv, paths);
+	if (first_pipe == -1)
+		return (-1);
+	arg_i = 2;
+	while (argv[++arg_i + 1])
+	{
+		p_cmd = parse_cmd(argv[arg_i], paths);
+		if (!p_cmd || pipe(new_pipe_fd) == -1)
+			return (-1);
+		pid = fork();
+		if (pid == -1)
+			return (-1);
+		else if (pid == 0)
+			return (run_command(first_pipe, new_pipe_fd, p_cmd, env));
+		close(new_pipe_fd[1]);
+		waitpid(pid, 0, 0);
+		free_split(p_cmd);
+		if (dup2(new_pipe_fd[0], first_pipe) == -1)
+			return (-1);
+		if (argv[arg_i + 2])
+			close(new_pipe_fd[0]);
+	}
+	return (write_command_output(new_pipe_fd[0], argv[argc - 1]));
+}
+
+char	**get_paths(char **env)
+{
+	int		i;
+	char	**paths;
+
+	i = -1;
+	while (env[++i])
+	{
+		if (ft_strncmp(env[i], "PATH", 4) == 0)
+		{
+			paths = ft_split(env[i] + 5, ':');
+			if (!paths)
+				return (NULL);
+			return (paths);
+		}
+	}
+	return (NULL);
 }
 
 int	main(int argc, char **argv, char **env)
 {
-	pid_t	pid;
-	int		pipe_fd[2];
-	int		new_entry;
-	int		arg_i;
-	char	*res[1023];
+	char	**paths;
 
-	if (pipe(pipe_fd) == -1)
-    {
-		perror("pipe");
-		return (1);
-    }
-	new_entry = open(argv[1], O_RDONLY);
-	if (new_entry == -1)
+	paths = get_paths(env);
+	if (!paths)
 	{
-		perror("bad entry");
-		return (1);
+		printf("env error\n");
+		return (-1);
 	}
-	arg_i = 2;
-	if(dup2(pipe_fd[0], 0) == -1)
-		perror("dup2 2/2");
-	while (argv[arg_i + 1])
+	if (argc < 5)
 	{
-		pid = fork();
-		if (pid == -1)
-		{
-			perror("fork");
-			return (1);
-		}
-		if (pid == 0)
-		{
-			if (arg_i == 2)
-			{
-				if (dup2(new_entry, 0) == -1)
-					perror("dup2 2/2");
-			}
-			printf("run command %s\n", argv[arg_i]);
-			run_command(pipe_fd, &argv[arg_i], env, new_entry);
-		}
-		else
-			wait(0);
-		++arg_i;
+		printf("not enough args\n");
+		return (-1);
 	}
-	printf("parent now read!\n");
-	read_command_output(pipe_fd, argv[argc - 1]);
-	close(pipe_fd[0]);
-	close(pipe_fd[1]);
-	return 0;
+	if (access(argv[1], R_OK) == -1)
+	{
+		perror("input");
+		return (-1);
+	}
+	if (access(argv[argc - 1], F_OK) == 0 && access(argv[argc - 1], W_OK) == -1)
+	{
+		perror("output");
+		return (-1);
+	}
+	if (iter_pipes(argc, argv, env, paths) == -1)
+	{
+		perror("MAIN");
+		return (-1);
+	}
+	return (1);
 }

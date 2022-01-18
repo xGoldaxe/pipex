@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 16:47:05 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/16 16:51:23 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/18 14:08:16 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 static unsigned int	countwords(char const *s, char c)
 {
 	unsigned int	nbrwords;
-	unsigned int	i;
+	int				i;
 	int				inword;
 
 	nbrwords = 0;
