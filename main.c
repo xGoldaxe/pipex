@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/15 16:24:13 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/18 19:31:16 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/18 19:47:58 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,6 @@ int	main(int argc, char **argv, char **env)
 {
 	char	**paths;
 	int		fd;
-	void	*test;
 
 	if (argc < 5)
 		return (input_error("Arguments", NULL, 1));
@@ -127,9 +126,5 @@ int	main(int argc, char **argv, char **env)
 		return (input_error("Excve", NULL, 0));
 	}
 	free_split(paths);
-	while (1)
-	{
-		test = malloc(10);	
-	}
 	return (0);
 }

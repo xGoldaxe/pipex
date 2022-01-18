@@ -80,6 +80,6 @@ char	**parse_cmd(char *command, char **paths)
 		free(full_path);
 	}
 	input_error("Command", parsed_cmd[0], 2);
-	free(parsed_cmd);
+	free_split(parsed_cmd);
 	return (NULL);
 }
