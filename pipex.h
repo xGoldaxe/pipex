@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/15 16:24:21 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/18 19:13:50 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/19 15:41:33 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define PIPEX_H
 
 # include <stdio.h>
+# include <errno.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <sys/wait.h>
@@ -31,6 +32,7 @@ void	*free_split(char **splited);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 int		ft_strclen(char *str, char c);
 int		ft_biggest(int a, int b);
+int     ft_strcmp(char *str1, char *str2);
 
 /* MAIN */
 int		first_cmd(char **argv, char **env, char **paths);

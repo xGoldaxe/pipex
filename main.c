@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/15 16:24:13 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/18 19:47:58 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/19 17:02:24 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,8 @@ int	iter_pipes(int argc, char **argv, char **env, char **paths)
 	char	**p_cmd;
 
 	arg_i = 2;
-	if (ft_strncmp(argv[2], "here_doc", 8) == 0)
-	{
+	if (ft_strcmp(argv[1], "here_doc") == 0)
 		first_pipe = limited_stdin(argv);
-		++arg_i;
-	}
 	else
 		first_pipe = first_cmd(argv, env, paths);
 	if (first_pipe == -1)
@@ -34,7 +31,9 @@ int	iter_pipes(int argc, char **argv, char **env, char **paths)
 	{
 		p_cmd = parse_cmd(argv[arg_i], paths);
 		if (!p_cmd)
-			write_command_output(first_pipe, argv[argc - 1], ft_strncmp(argv[2], "here_doc", 8) == 0);
+		{
+			write_command_output(first_pipe, argv[argc - 1], ft_strcmp(argv[1], "here_doc"));
+		}
 		else
 		{
 			if (pipe(new_pipe_fd) == -1)
@@ -58,7 +57,7 @@ int	iter_pipes(int argc, char **argv, char **env, char **paths)
 				close(new_pipe_fd[0]);
 		}
 	}
-	return (write_command_output(new_pipe_fd[0], argv[argc - 1], ft_strncmp(argv[2], "here_doc", 8) == 0));
+	return (write_command_output(first_pipe, argv[argc - 1], ft_strcmp(argv[1], "here_doc") == 0));
 }
 
 char	**get_paths(char **env)
@@ -89,17 +88,29 @@ int	input_error(char *error_type, char	*precision, int type)
 		perror("Malloc failed");
 	else
 	{
-		perror(error);
-		printf("\033[0m");
 		if (type == 1)
 		{
+			write(2, "\033[1;31mInvalid arguments\033[0m\n", 29);
 			printf("Try: ./pipex <file1> <cmd1> <cmd2> <...> file2");
 			printf("\n     ./pipex here_doc <LIMITER> <cmd> <cmd1> <...> file");
 		}
-		if (type == 2)
-			printf("Invalid command: \033[1;35m%s\n\033[0m", precision);
-		free(error);
+		else
+		{
+			if (type == 2)
+			{
+				perror(error);
+				write(2, "\033[0m", 4);
+				printf("Invalid command: \033[1;35m%s\n\033[0m", precision);
+			}
+			if (type == 3)
+			{
+				errno = EIO;
+				perror(error);
+				printf("Invalid file: \033[1;35m%s\n\033[0m", precision);
+			}
+		}
 	}
+	free(error);
 	return (1);
 }
 
@@ -110,16 +121,16 @@ int	main(int argc, char **argv, char **env)
 
 	if (argc < 5)
 		return (input_error("Arguments", NULL, 1));
-	if (access(argv[1], R_OK) == -1)
-		return (input_error("Infile", NULL, 1));
-	if (access(argv[argc - 1], F_OK) == 0 && access(argv[argc - 1], W_OK) == -1)
-		return (input_error("Outfile", NULL, 1));
+	if (ft_strcmp("here_doc", argv[1]) && access(argv[1], R_OK) == -1)
+		return (input_error("Infile", argv[1], 3));
+	if (access(argv[argc - 1], F_OK) == 0 && access(argv[argc - 1], W_OK | R_OK) == -1)
+		return (input_error("Outfile", argv[argc - 1], 3));
 	fd = open(argv[argc - 1], O_CREAT, S_IRWXU);
 	if (fd == -1)
-		return (input_error("Outfile", NULL, 1));
+		return (input_error("Outfile", argv[argc - 1], 3));
 	paths = get_paths(env);
 	if (!paths)
-		return (input_error("Environement", NULL, 1));
+		return (input_error("Environement", NULL, 4));
 	if (iter_pipes(argc, argv, env, paths) == -1)
 	{
 		free_split(paths);

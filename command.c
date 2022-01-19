@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 19:13:26 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/18 19:29:18 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/19 16:48:31 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,6 @@ char	**parse_cmd(char *command, char **paths)
 	parsed_cmd = ft_split(command, ' ');
 	if (!parsed_cmd)
 		return (NULL);
-	if (access(parsed_cmd[0], F_OK | X_OK) == 0)
-		return (parsed_cmd);
 	i = -1;
 	while (paths[++i])
 	{
@@ -79,6 +77,8 @@ char	**parse_cmd(char *command, char **paths)
 		}
 		free(full_path);
 	}
+	if (access(parsed_cmd[0], F_OK | X_OK) == 0)
+		return (parsed_cmd);
 	input_error("Command", parsed_cmd[0], 2);
 	free_split(parsed_cmd);
 	return (NULL);

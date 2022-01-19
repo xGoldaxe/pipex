@@ -1,4 +1,4 @@
-SRC = main.c utils.c first_cmd.c ft_split.c command.c\
+SRC = main.c utils.c first_cmd.c ft_split.c command.c utils2.c\
 get_next_line_utils.c \
 get_next_line.c \
 

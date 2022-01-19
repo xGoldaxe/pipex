@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 16:59:01 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/18 19:13:32 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/19 16:42:08 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,9 +55,11 @@ int	limited_stdin(char **argv)
 	while (line || first_iteration)
 	{
 		line = get_next_line(0);
-		if (!line || ft_strncmp(line, argv[3],
-				ft_biggest(ft_strlen(argv[3]), ft_strclen(line, '\n'))) == 0)
+		if (!line || ft_strncmp(line, argv[2],
+				ft_biggest(ft_strlen(argv[2]), ft_strclen(line, '\n'))) == 0)
 		{
+			if (line)
+				free(line);
 			close(pipe_fd[1]);
 			close(pipe_fd[1]);
 			return (pipe_fd[0]);
@@ -66,7 +68,6 @@ int	limited_stdin(char **argv)
 		free(line);
 		first_iteration = 0;
 	}
-	return (-1);
 	close(pipe_fd[1]);
 	return (pipe_fd[0]);
 }
