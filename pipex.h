@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/15 16:24:21 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/19 15:41:33 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/20 12:10:31 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,10 @@ void	*free_split(char **splited);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 int		ft_strclen(char *str, char c);
 int		ft_biggest(int a, int b);
-int     ft_strcmp(char *str1, char *str2);
+int		ft_strcmp(char *str1, char *str2);
+int		free_split_int(char **splitted);
+void	close_pipe(int *pipe);
+int		fork_store(pid_t *pid_res);
 
 /* MAIN */
 int		first_cmd(char **argv, char **env, char **paths);
@@ -41,5 +44,6 @@ char	**parse_cmd(char *command, char **paths);
 int		input_error(char *error_type, char	*precision, int type);
 int		limited_stdin(char **argv);
 int		write_command_output(int pipe_fd, char *output, int add_to);
+int		iter_pipes(int argc, char **argv, char **env, char **paths);
 
 #endif

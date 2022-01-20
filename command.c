@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 19:13:26 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/19 16:48:31 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/20 11:30:46 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ int	write_command_output(int pipe_fd, char *output, int add_to)
 	return (0);
 }
 
+/* close all the open fd */
+
 int	run_command(int entry_pipe, int	*pipe_fd, char **parsed_cmd, char **env)
 {
 	if (dup2(entry_pipe, 0) == -1 || dup2(pipe_fd[1], 1) == -1)
@@ -53,12 +55,30 @@ int	run_command(int entry_pipe, int	*pipe_fd, char **parsed_cmd, char **env)
 	return (-1);
 }
 
+char	*create_path(char *path, char *filename)
+{
+	char	*tmp;
+	char	*full_path;
+
+	tmp = ft_strjoin(path, "/");
+	if (!tmp)
+		return (NULL);
+	full_path = ft_strjoin(tmp, filename);
+	free(tmp);
+	return (full_path);
+}
+
+void	*replace_and_free(void *src, void *dst)
+{
+	free(dst);
+	return (src);
+}
+
 char	**parse_cmd(char *command, char **paths)
 {
 	char	**parsed_cmd;
 	int		i;
 	char	*full_path;
-	char	*tmp;
 
 	parsed_cmd = ft_split(command, ' ');
 	if (!parsed_cmd)
@@ -66,20 +86,19 @@ char	**parse_cmd(char *command, char **paths)
 	i = -1;
 	while (paths[++i])
 	{
-		tmp = ft_strjoin(paths[i], "/");
-		full_path = ft_strjoin(tmp, parsed_cmd[0]);
-		free(tmp);
+		full_path = create_path(paths[i], parsed_cmd[0]);
+		if (!full_path)
+			return (free_split(parsed_cmd));
 		if (access(full_path, F_OK | X_OK) == 0)
 		{
-			free(parsed_cmd[0]);
-			parsed_cmd[0] = full_path;
+			parsed_cmd[0] = replace_and_free(full_path, parsed_cmd[0]);
 			return (parsed_cmd);
 		}
 		free(full_path);
 	}
 	if (access(parsed_cmd[0], F_OK | X_OK) == 0)
 		return (parsed_cmd);
-	input_error("Command", parsed_cmd[0], 2);
+	input_error("Invalid command\n", parsed_cmd[0], 2);
 	free_split(parsed_cmd);
 	return (NULL);
 }

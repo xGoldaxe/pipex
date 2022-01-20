@@ -6,13 +6,14 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 16:59:01 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/19 16:42:08 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/19 17:52:39 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-/* use a command and send join it to new_pipe_fd[0] */
+/* Read the first command with argv and send back what was readed
+even if nothing was readed due to a bad command */
 
 int	first_cmd(char **argv, char **env, char **paths)
 {
@@ -37,22 +38,24 @@ int	first_cmd(char **argv, char **env, char **paths)
 		return (-1);
 	if (pid == 0)
 		return (run_command(new_entry, pipe_fd, parsed_cmd, env));
+	close(new_entry);
 	close(pipe_fd[1]);
 	free_split(parsed_cmd);
 	return (pipe_fd[0]);
 }
 
+/* read the stdin and write on a pipe until a line is 
+equal to the limiter or stdin is close. Return the pipe entry*/
+
 int	limited_stdin(char **argv)
 {
 	char	*line;
 	int		pipe_fd[2];
-	int		first_iteration;
 
 	if (pipe(pipe_fd) == -1)
 		return (-1);
-	first_iteration = 1;
 	line = NULL;
-	while (line || first_iteration)
+	while (1)
 	{
 		line = get_next_line(0);
 		if (!line || ft_strncmp(line, argv[2],
@@ -61,13 +64,10 @@ int	limited_stdin(char **argv)
 			if (line)
 				free(line);
 			close(pipe_fd[1]);
-			close(pipe_fd[1]);
 			return (pipe_fd[0]);
 		}
 		write(pipe_fd[1], line, ft_strlen(line));
 		free(line);
-		first_iteration = 0;
 	}
-	close(pipe_fd[1]);
-	return (pipe_fd[0]);
+	return (-1);
 }
