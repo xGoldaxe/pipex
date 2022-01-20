@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 19:13:26 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/20 11:30:46 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/20 12:28:16 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,7 @@ int	run_command(int entry_pipe, int	*pipe_fd, char **parsed_cmd, char **env)
 {
 	if (dup2(entry_pipe, 0) == -1 || dup2(pipe_fd[1], 1) == -1)
 		return (-1);
-	close(pipe_fd[0]);
-	close(pipe_fd[1]);
+	close_pipe(pipe_fd);
 	close(entry_pipe);
 	if (!parsed_cmd)
 		perror("split error");

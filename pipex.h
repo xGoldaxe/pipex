@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/15 16:24:21 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/20 12:10:31 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/20 12:31:59 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ int		ft_strcmp(char *str1, char *str2);
 int		free_split_int(char **splitted);
 void	close_pipe(int *pipe);
 int		fork_store(pid_t *pid_res);
+int		open_store(int *fd_res, char *filename, int mode);
 
 /* MAIN */
 int		first_cmd(char **argv, char **env, char **paths);

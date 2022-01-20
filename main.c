@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/15 16:24:13 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/20 12:03:34 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/20 12:35:49 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int	main(int argc, char **argv, char **env)
 	if (ft_strcmp("here_doc", argv[1]) != 0 && access(argv[1], R_OK) == -1)
 		return (input_error("Infile", argv[1], 3));
 	if (access(argv[argc - 1], F_OK) == 0
-		&& access(argv[argc - 1], W_OK | R_OK) == -1)
+		&& access(argv[argc - 1], W_OK) == -1)
 		return (input_error("Outfile", argv[argc - 1], 3));
 	fd = open(argv[argc - 1], O_CREAT, S_IRWXU);
 	if (fd == -1)

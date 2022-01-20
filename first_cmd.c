@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/17 16:59:01 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/19 17:52:39 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/20 12:34:31 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,14 @@ int	first_cmd(char **argv, char **env, char **paths)
 		close(pipe_fd[1]);
 		return (pipe_fd[0]);
 	}
-	new_entry = open(argv[1], O_RDONLY);
-	if (new_entry == -1)
-		return (-1);
+	if (open_store(&new_entry, argv[1], O_RDONLY) == -1)
+		return (free_split_int(parsed_cmd));
 	pid = fork();
 	if (pid == -1 || new_entry == -1)
-		return (-1);
+		return (free_split_int(parsed_cmd));
 	if (pid == 0)
-		return (run_command(new_entry, pipe_fd, parsed_cmd, env));
+		if (run_command(new_entry, pipe_fd, parsed_cmd, env) == -1)
+			return (free_split_int(parsed_cmd));
 	close(new_entry);
 	close(pipe_fd[1]);
 	free_split(parsed_cmd);

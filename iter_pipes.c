@@ -6,7 +6,7 @@
 /*   By: pleveque <pleveque@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/20 12:03:44 by pleveque          #+#    #+#             */
-/*   Updated: 2022/01/20 12:05:17 by pleveque         ###   ########.fr       */
+/*   Updated: 2022/01/20 12:37:04 by pleveque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,13 @@ int	get_first_pipe(char **argv, char **env, char **paths)
 		return (first_cmd(argv, env, paths));
 }
 
-int	run_process_command(int first_pipe, int *new_pipe_fd, char **p_cmd, char **env)
+int	run_process_command(int first_pipe, int *new_pipe_fd,
+char **p_cmd, char **env)
 {
 	pid_t	pid;
 
 	if (fork_store(&pid) == -1)
-		return (free_split_int(p_cmd));
+		return (-1);
 	else if (pid == 0)
 		return (run_command(first_pipe, new_pipe_fd, p_cmd, env));
 	return (0);
@@ -48,10 +49,10 @@ int	iter_pipes(int argc, char **argv, char **env, char **paths)
 		if (p_cmd)
 		{
 			if (run_process_command(first_pipe, new_pipe_fd, p_cmd, env) == -1)
-				return (-1);
+				return (free_split_int(p_cmd));
 		}
 		if (dup2(new_pipe_fd[0], first_pipe) == -1)
-			return (-1);
+			return (free_split_int(p_cmd));
 		close_pipe(new_pipe_fd);
 		free_split(p_cmd);
 	}
